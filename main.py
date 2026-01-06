@@ -2,10 +2,11 @@
 main.py
 
 Usage:
-    python main.py /[PATH_TO_AUDIO_FILE]/file.txt
+    python main.py audiofile.txt
 """
 
 import whisper
+import librosa
 import sys
 import argparse
 from pathlib import Path
@@ -44,8 +45,15 @@ def main() -> None:
 
 def transcribe_audio(file_path: Path) -> str:
     model = whisper.load_model("base")
-    result = model.transcribe(str(file_path), fp16=False)
-    return result["text"]
+
+    audio, sr = librosa.load(str(file_path), sr=16000) # Load audio file with 16000 Hz sampling rate with Librosa
+
+    audio = whisper.pad_or_trim(audio) # Process audio through whisper
+    mel = whisper.log_mel_spectrogram(audio).to(model.device) # Convert audio to mel spectrogram
+
+    options = whisper.DecodingOptions(fp16=False) # Set decoding options
+    result = whisper.decode(model, mel, options) # Decode the audio
+    return result.text # Return the transcription
 
 
 if __name__ == "__main__":
