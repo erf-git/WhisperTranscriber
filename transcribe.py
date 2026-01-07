@@ -9,7 +9,7 @@ import sys
 import argparse
 from pathlib import Path
 
-from whisper_utils import recorded_transcribe
+from whisper_utils import recorded_transcribe, break_up_lines
 
 FILE_DIR = None # Global variable to store working file directory
 
@@ -36,7 +36,8 @@ def main() -> None:
         sys.exit(1)
 
     try:
-        result = recorded_transcribe(audio_file_path)        
+        # Transcription result, then break up lines by sentences
+        result = break_up_lines(recorded_transcribe(audio_file_path))  
         open(OUT_DIR / "transcription.txt", "w").write(result)
         print("Transcription complete.")
     except Exception as exc:
