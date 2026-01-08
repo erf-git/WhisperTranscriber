@@ -5,9 +5,9 @@ openai_utils.py
 """
 
 import whisper
-import openai
 import librosa
 import re
+import os
 from pathlib import Path
 
 
@@ -47,28 +47,27 @@ def transcribe(file_path: Path) -> str:
     return result 
 
 
-def summarize_text(text: str) -> str:
+def summarize(text: str, api_key: str) -> str:
     """
     Summarize the transcribed text using an OpenAI.
-    Uses OpenAI API by default, but falls back to a simple extractive summary if API key is not set.
+    Uses OpenAI API by default, but falls back to a simple transcription if API key is not set.
     """
     
     # Try to use OpenAI API if available
     try:
-        api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
-            print("Warning: OPENAI_API_KEY not found. Using simple extractive summary instead.")
+            print("Warning: OPENAI_API_KEY not found. Using simple transcription instead.")
             return text
         
         client = openai.OpenAI(api_key=api_key)
         
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant that summarizes transcribed audio content concisely and accurately."},
                 {"role": "user", "content": f"Please provide a concise summary of the following transcription:\n\n{text}"}
             ],
-            max_tokens=500,
+            max_tokens=50,
             temperature=0.3
         )
         

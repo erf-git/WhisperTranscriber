@@ -10,6 +10,7 @@ import argparse
 from pathlib import Path
 
 from openai_utils import transcribe, break_up_lines
+from bart_utils import summarize
 
 FILE_DIR = None # Global variable to store working file directory
 
@@ -44,8 +45,13 @@ def main() -> None:
     except Exception as exc:
         print(f"Error: {exc}", file=sys.stderr)
         sys.exit(2)
-    
-    
+
+    i = input("Would you like a summary of the audio? (Y/n) ")
+    if i == "Y":
+        summary = summarize(result)
+        SUMMARY_PATH = OUT_DIR / "summary.txt"
+        open(SUMMARY_PATH, "w").write(summary)
+        print(f"Summary saved to: {SUMMARY_PATH}")
 
 
 if __name__ == "__main__":
