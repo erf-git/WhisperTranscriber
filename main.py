@@ -9,6 +9,7 @@ import whisper
 import librosa
 import sys
 import argparse
+import os
 from pathlib import Path
 
 FILE_DIR = None # Global variable to store working file directory
@@ -37,8 +38,16 @@ def main() -> None:
 
     try:
         result = transcribe_audio(audio_file_path)        
-        open(OUT_DIR / "transcription.txt", "w").write(result)
-        print("Transcription complete.")
+        TRANSCRIPT_PATH = OUT_DIR / "transcription.txt"
+        open(TRANSCRIPT_PATH, "w").write(result)
+        print(f"Transcription saved to: {TRANSCRIPT_PATH}")
+        
+        # Generate summary
+        print("Generating summary...")
+        summary = summarize_text(result)
+        SUMMARY_PATH = OUT_DIR / "summary.txt"
+        open(SUMMARY_PATH, "w").write(summary)
+        print(f"Summary saved to: {SUMMARY_PATH}")
     except Exception as exc:
         print(f"Error: {exc}", file=sys.stderr)
         sys.exit(2)

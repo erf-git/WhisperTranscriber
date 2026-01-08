@@ -9,7 +9,7 @@ import sys
 import argparse
 from pathlib import Path
 
-from whisper_utils import recorded_transcribe, break_up_lines
+from openai_utils import transcribe, break_up_lines
 
 FILE_DIR = None # Global variable to store working file directory
 
@@ -27,22 +27,25 @@ def main() -> None:
 
     args = parser.parse_args()
     filename = args.filename
-    audio_file_path = FILE_DIR / "audio" / filename
+    AUDIO_PATH = FILE_DIR / filename
 
-    print("Selected audio file: ", audio_file_path)
+    print("Selected audio file: ", AUDIO_PATH)
 
-    if not audio_file_path.exists():
-        print(f"Error: Audio file not found: {audio_file_path}", file=sys.stderr)
+    if not AUDIO_PATH.exists():
+        print(f"Error: Audio file not found: {AUDIO_PATH}", file=sys.stderr)
         sys.exit(1)
 
     try:
         # Transcription result, then break up lines by sentences
-        result = break_up_lines(recorded_transcribe(audio_file_path))  
-        open(OUT_DIR / "transcription.txt", "w").write(result)
-        print("Transcription complete.")
+        result = break_up_lines(transcribe(AUDIO_PATH))        
+        TRANSCRIPT_PATH = OUT_DIR / "transcription.txt"
+        open(TRANSCRIPT_PATH, "w").write(result)
+        print(f"Transcription saved to: {TRANSCRIPT_PATH}")
     except Exception as exc:
         print(f"Error: {exc}", file=sys.stderr)
         sys.exit(2)
+    
+    
 
 
 if __name__ == "__main__":
